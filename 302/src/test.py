@@ -13,6 +13,7 @@ end = 1000
 
 if __name__ == '__main__':
     for u in U:
-        ave_dir = super_dir + f"{u}_302/ave/"
-        data = np.loadtxt(ave_dir + "ave.csv", delimiter=",")
-        error = calc.my_fitting(data=data, U=u)
+        # ave_dir = super_dir + f"{u}_302/ave/"
+        # data = np.loadtxt(ave_dir + "ave.csv", delimiter=",")
+        data = np.loadtxt(super_dir + "sample_cp.csv", delimiter=",")
+        error = calc.my_fitting(data=data, U=200)
