@@ -27,7 +27,7 @@ def update_x(x, v):
     return x + v
 
 
-def update_v(x, v, p_i, p_g, w=0.5, r_max=1.0, c1=1, c2=10):
+def update_v(x, v, p_i, p_g, w=0.5, r_max=1.0, c1=1, c2=1):
     new_v = np.zeros_like(v)
 
     # set two randoms (default: [0, 1.0])
@@ -35,7 +35,7 @@ def update_v(x, v, p_i, p_g, w=0.5, r_max=1.0, c1=1, c2=10):
     r2 = random.uniform(0, r_max)
 
     for i in range(len(x)):
-        new_v[i] = w * float(v[i]) + c1 * r1 * (float(p_i[i]) - float(x[i])) + c2 * r2 * (float(p_g[0]) - float(x[i]))
+        new_v[i] = w * float(v[i]) + c1 * r1 * (float(p_i[i]) - float(x[i])) + c2 * r2 * (float(p_g[i]) - float(x[i]))
 
     return new_v
 
@@ -46,7 +46,7 @@ def main(vel_data, U):
     np.random.seed(0)
 
     # set params
-    n = 10000             # particles
+    n = 1000000           # particles
     dim = 3               # dimensions
     generation = 1000     # max generations
     m_range = [0, 3000]   # m range

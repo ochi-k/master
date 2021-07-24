@@ -150,9 +150,9 @@ def my_fitting(data, U):
     vel_inv = torch.tensor(data_drop_na[[4, 5]].values)
 
     # set params and optimizer
-    m = torch.tensor(1990.0, requires_grad=True)
-    x0 = torch.tensor(8.524, requires_grad=True)
-    y0 = torch.tensor(-2.235, requires_grad=True)
+    m = torch.tensor(2678.81709086, requires_grad=True)
+    x0 = torch.tensor(11.03601662, requires_grad=True)
+    y0 = torch.tensor(-5.18455088, requires_grad=True)
     params = [m, x0, y0]
 
     lr = 1  # learning rate
