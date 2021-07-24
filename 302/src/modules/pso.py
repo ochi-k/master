@@ -63,10 +63,10 @@ def main(vel_data, U):
         xs[i][2] = random.uniform(*y0_range)  # y0 init
 
     # set vals for evaluation
-    p_i = xs                                  # best position of the i-th particle
+    p_i = xs                                               # best position of the i-th particle
     best_scores = [eval_func(vel_data, U, x) for x in xs]  # eval personal best
-    best_particle = np.argmin(best_scores)    # particle index in minimum evals
-    p_g = p_i[best_particle]                  # global best
+    best_particle = np.argmin(best_scores)                 # particle index in minimum evals
+    p_g = p_i[best_particle]                               # global best
 
     # generations loop
     for t in tqdm(range(generation)):
