@@ -5,6 +5,11 @@ import pandas as pd
 import torch
 
 
+"""
+calc velocity property
+"""
+
+
 def d_dx2(a, dx):
     return (a[2][2] - a[2][0] + 2 * (a[1][2] - a[1][0]) + a[0][2] - a[0][0]) / 8 / dx
 
@@ -82,6 +87,11 @@ def shear(data, grid, option=None):
     return (dv_dx + du_dy).flatten()
 
 
+"""
+Calc fitting
+"""
+
+
 def loss_func(vel, x, y, U, m, x0, y0):
     # calc velocity
     _u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2) \
@@ -111,8 +121,8 @@ def test_func(vel, x, y, U, m, x0, y0):
     a = np.count_nonzero(np.isnan(_vel_pred.detach().numpy().copy()))
 
     # calc error
-    # error = (vel - _vel_pred).norm() / vel.norm()
-    error = (vel - _vel_inv_pred).norm() / vel.norm()
+    error = (vel - _vel_pred).norm() / vel.norm()
+    # error = (vel - _vel_inv_pred).norm() / vel.norm()
 
     d = vel.norm()
     dd = (vel - _vel_inv_pred).detach().numpy().copy()
@@ -141,8 +151,8 @@ def my_fitting(data, U):
 
     # set params and optimizer
     m = torch.tensor(1990.0, requires_grad=True)
-    x0 = torch.tensor(10.0, requires_grad=True)
-    y0 = torch.tensor(-4.0, requires_grad=True)
+    x0 = torch.tensor(8.524, requires_grad=True)
+    y0 = torch.tensor(-2.235, requires_grad=True)
     params = [m, x0, y0]
 
     lr = 1  # learning rate
@@ -159,7 +169,7 @@ def my_fitting(data, U):
     for i in range(1000):
         print(f"Step: {i}")
         optimizer.zero_grad()
-        outputs = test_func(vel_inv, x, y, U, *params)
+        outputs = test_func(vel, x, y, U, *params)
         outputs.backward()
         optimizer.step()
         m_list.append(m.item())

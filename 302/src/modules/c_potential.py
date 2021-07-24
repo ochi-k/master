@@ -142,7 +142,7 @@ if __name__ == '__main__':
     y_min, y_max = -50, 50
     x = np.array([x_min, x_max])
     y = np.array([y_min, y_max])
-    n = np.array([1000, 1000])  # grid_num(#x, #y)
+    n = np.array([100, 100])  # grid_num(#x, #y) TODO: 100 -> 1000
 
     # instance
     field = Field(x, y, n)
