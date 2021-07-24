@@ -88,13 +88,10 @@ def main(vel_data, U):
     print("\n[generate]")
     for t in tqdm(range(generation)):
         file = open("../../data/pso/pso" + str(t + 1) + ".txt", "w")
+        print(f"\n[Gen. {t}]")
 
         # particles loop
-        pbar = tqdm(range(n))
-        for i in pbar:
-            # show progress bar
-            pbar.set_description(f"[Gen. {t}]")
-
+        for i in tqdm(range(n)):
             # write file
             file.write(str(xs[i][0]) + " " + str(xs[i][1]) + " " + str(xs[i][2]) + "\n")
 
@@ -117,11 +114,14 @@ def main(vel_data, U):
 
         print(f"\n{t}/{generation} generation fin.")
 
-    print(p_g.item())
-    print(torch.min(best_scores).item())
+    print(f"\n{p_g.item()}")
+    print(f"\n{torch.min(best_scores).item()}")
 
 
 if __name__ == '__main__':
+    print("start program!")
+
     data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
     main(data, U=200)
+
     print("pso for gpu fin.")
