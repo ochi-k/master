@@ -3,7 +3,6 @@ import random
 import numpy as np
 import pandas as pd
 import torch
-from torch.distributions.uniform import Uniform
 from tqdm import tqdm
 
 
@@ -59,9 +58,9 @@ def main(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 1000000           # particles
+    n = 10000             # particles
     dim = 3               # dimensions
-    generation = 1000     # max generations
+    generation = 10       # max generations
     m_range = [0, 3000]   # m range
     x0_range = [-40, 40]  # x0 range
     y0_range = [-40, 40]  # y0 range
@@ -83,20 +82,21 @@ def main(vel_data, U):
                                device=device)
     best_particle = torch.argmin(best_scores)                                   # particle index in minimum evals
     p_g = p_i[best_particle.item()]                                             # global best
+    judge = 100
+    tmp_p_g = None
+    flag = 0
 
     # generations loop
     print("\n[generate]")
-    for t in tqdm(range(generation)):
+    for t in range(generation):
         file = open("../../data/pso/pso" + str(t + 1) + ".txt", "w")
-        print(f"\n[Gen. {t}]")
 
-        # particles loop
-        for i in tqdm(range(n)):
+        for i in tqdm(range(n), desc=f"\n[Gen. {t+1} / {generation}]"):
             # write file
             file.write(str(xs[i][0]) + " " + str(xs[i][1]) + " " + str(xs[i][2]) + "\n")
 
             # update velocity
-            vs[i] = update_v(device, xs[i], vs[i], p_i[i], p_g)
+            vs[i] = update_v(device, xs[i], vs[i], p_i[i], p_g, r_max=0.5)
 
             # update position
             xs[i] = update_x(xs[i], vs[i])
@@ -107,15 +107,27 @@ def main(vel_data, U):
                 best_scores[i] = score
                 p_i[i] = xs[i]
 
-        # update global best
-        best_particle = torch.argmin(best_scores)
-        p_g = p_i[best_particle.item()]
+        # save particles
         file.close()
 
-        print(f"\n{t}/{generation} generation fin.")
+        # update global best
+        if torch.min(best_scores) < judge:
+            flag = 0
+            judge = torch.min(best_scores)
+            best_particle = torch.argmin(best_scores)
+            tmp_p_g = p_i[best_particle.item()].clone().detach()
 
-    print(f"\n{p_g.item()}")
-    print(f"\n{torch.min(best_scores).item()}")
+        else:
+            flag += 1
+
+        if flag > 2:
+            break
+
+        best_particle = torch.argmin(best_scores)
+        p_g = p_i[best_particle.item()]
+
+    print(f"\n{tmp_p_g}")
+    print(f"{judge}")
 
 
 if __name__ == '__main__':
@@ -124,4 +136,4 @@ if __name__ == '__main__':
     data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
     main(data, U=200)
 
-    print("pso for gpu fin.")
+    print("\nPSO for gpu fin.")

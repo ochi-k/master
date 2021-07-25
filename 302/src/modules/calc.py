@@ -1,5 +1,3 @@
-import functools
-
 import numpy as np
 import pandas as pd
 import torch
@@ -150,12 +148,12 @@ def my_fitting(data, U):
     vel_inv = torch.tensor(data_drop_na[[4, 5]].values)
 
     # set params and optimizer
-    m = torch.tensor(2678.81709086, requires_grad=True)
-    x0 = torch.tensor(11.03601662, requires_grad=True)
-    y0 = torch.tensor(-5.18455088, requires_grad=True)
+    m = torch.tensor(2020.7799, requires_grad=True)
+    x0 = torch.tensor(10.0186, requires_grad=True)
+    y0 = torch.tensor(-5.0152, requires_grad=True)
     params = [m, x0, y0]
 
-    lr = 1  # learning rate
+    lr = 0.01  # learning rate
     optimizer = torch.optim.Adam(params, lr)
 
     # optimization
@@ -166,7 +164,7 @@ def my_fitting(data, U):
     f_list = []
     i_list = []
 
-    for i in range(1000):
+    for i in range(100000):
         print(f"Step: {i}")
         optimizer.zero_grad()
         outputs = test_func(vel, x, y, U, *params)
@@ -178,10 +176,14 @@ def my_fitting(data, U):
         f_list.append(outputs.item())
         i_list.append(i)
 
+        if outputs < 1e-4:
+            break
+
     from matplotlib import pyplot as plt
 
     fig = plt.figure(figsize=(15, 10))
     plt.scatter(i_list, f_list)
+    plt.yscale('log')
     plt.ylim(0, 1)
     fig.show()
 
