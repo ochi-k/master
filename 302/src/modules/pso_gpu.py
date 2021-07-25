@@ -40,7 +40,7 @@ def update_v(device, x, v, p_i, p_g, w=0.5, r_max=1.0, c1=1, c2=1):
     return new_v
 
 
-def main(vel_data, U):
+def pso(vel_data, U):
     # set device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     # device = "cpu"
@@ -58,12 +58,12 @@ def main(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 10000             # particles
+    n = 10             # particles  TODO 10000
     dim = 3               # dimensions
     generation = 10       # max generations
-    m_range = [0, 3000]   # m range
-    x0_range = [-40, 40]  # x0 range
-    y0_range = [-40, 40]  # y0 range
+    m_range = [0, 6000]   # m range
+    x0_range = [0, 160]   # x0 range
+    y0_range = [0, 120]   # y0 range
 
     # initialize particle position
     xs = torch.zeros(n, dim, device=device)
@@ -89,12 +89,7 @@ def main(vel_data, U):
     # generations loop
     print("\n[generate]")
     for t in range(generation):
-        file = open("../../data/pso/pso" + str(t + 1) + ".txt", "w")
-
         for i in tqdm(range(n), desc=f"\n[Gen. {t+1} / {generation}]"):
-            # write file
-            file.write(str(xs[i][0]) + " " + str(xs[i][1]) + " " + str(xs[i][2]) + "\n")
-
             # update velocity
             vs[i] = update_v(device, xs[i], vs[i], p_i[i], p_g, r_max=0.5)
 
@@ -106,9 +101,6 @@ def main(vel_data, U):
             if score.item() < best_scores[i].item():
                 best_scores[i] = score
                 p_i[i] = xs[i]
-
-        # save particles
-        file.close()
 
         # update global best
         if torch.min(best_scores) < judge:
@@ -129,11 +121,14 @@ def main(vel_data, U):
     print(f"\n{tmp_p_g}")
     print(f"{judge}")
 
+    return pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
+                                  min(best_scores).to('cpu').detach().numpy().copy())])
+
 
 if __name__ == '__main__':
     print("start program!")
 
     data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
-    main(data, U=200)
+    error = pso(data, U=200)
 
     print("\nPSO for gpu fin.")
