@@ -58,7 +58,7 @@ def pso(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 10             # particles  TODO 10000
+    n = 10000             # particles
     dim = 3               # dimensions
     generation = 10       # max generations
     m_range = [0, 6000]   # m range
