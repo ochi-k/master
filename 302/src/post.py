@@ -86,7 +86,7 @@ def graph():
     for u in U:
         ave_dir = super_dir + f"{u}_302/ave/"
         data = np.loadtxt(ave_dir + "div.csv", delimiter=",")
-        quiver(data, speed=u, mode="show")
+        quiver(data, speed=u, mode="save", out_dir=ave_dir)
 
 
 def main():
