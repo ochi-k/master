@@ -65,8 +65,10 @@ def quiver(data, speed=0, mode=None, out_dir="/"):
     pp = plt.colorbar()
     for t in pp.ax.get_yticklabels():
         t.set_fontsize(24)
-    pp.set_label('\n|'r'$\mathbf{u}$| / $\it{U}$ [-]', fontsize=28)
+    # pp.set_label('\n|'r'$\mathbf{u}$| / $\it{U}$ [-]', fontsize=28)
+    pp.set_label(''r'$\nabla$ $\cdot$ $\mathbf{u}$', fontsize=28)
     plt.clim(-10, 10)
+    # plt.clim(0, 1.5)
 
     x = x[0::2, 0::2]
     y = y[0::2, 0::2]
@@ -79,14 +81,16 @@ def quiver(data, speed=0, mode=None, out_dir="/"):
         plt.show()
 
     elif mode == "save":
-        fig.savefig(out_dir + f"ave_graph_{speed}.png", dpi=300)
+        # fig.savefig(out_dir + f"ave_graph_{speed}.png", dpi=300)
+        fig.savefig(out_dir + f"div_graph_{speed}.png", dpi=300)
 
 
 def graph():
     for u in U:
         ave_dir = super_dir + f"{u}_302/ave/"
         data = np.loadtxt(ave_dir + "div.csv", delimiter=",")
-        quiver(data, speed=u, mode="save", out_dir=ave_dir)
+        # quiver(data, speed=u, mode="save", out_dir=ave_dir)
+        quiver(data, speed=u, mode="save", out_dir=super_dir + f"{u}_302/ave/")
 
 
 def main():

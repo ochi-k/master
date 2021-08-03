@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def eval_func(vel, U, params):  # evaluation function
+def eval_func(vel, U, params):  # rel vector norm
     x = vel[:, 0]
     y = vel[:, 1]
     m, x0, y0 = params
@@ -19,6 +19,79 @@ def eval_func(vel, U, params):  # evaluation function
     error_norm = np.linalg.norm(vel[:, 2:4] - vel_pred, ord=2)
     vel_norm = np.linalg.norm(vel[:, 2:4], ord=2)
     error = error_norm / vel_norm
+
+    return error
+
+
+def eval_func2(vel, U, params):  # divided by representative velocity
+    x = vel[:, 0]
+    y = vel[:, 1]
+    m, x0, y0 = params
+
+    # calc velocity
+    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    vel_pred = np.vstack([u, v]).T
+
+    # calc error
+    error_norm = np.linalg.norm(vel[:, 2:4] - vel_pred, ord=2)
+    error = error_norm / U
+
+    return error
+
+
+def eval_func3(vel, U, params):  # speed comparison
+    x = vel[:, 0]
+    y = vel[:, 1]
+    m, x0, y0 = params
+
+    # calc velocity
+    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    vel_pred = np.vstack([u, v]).T
+
+    # calc error
+    error = np.abs(vel[:, 2] ** 2 + vel[:, 3] ** 2 - vel_pred[:, 0] ** 2 - vel_pred[:, 1] ** 2)
+
+    return error
+
+
+def eval_func4(vel, U, params):  # cross correlation of vectors
+    x = vel[:, 0]
+    y = vel[:, 1]
+    m, x0, y0 = params
+
+    # calc velocity
+    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    vel_pred = np.vstack([u, v]).T
+
+    # calc error
+    cc = (vel[:, 2] * vel_pred[:, 0] + vel[:, 3] * vel_pred[:, 1])\
+         / np.sqrt(vel[:, 2] ** 2 + vel[:, 3] ** 2)\
+         / np.sqrt(vel_pred[:, 0] ** 2 + vel_pred[:, 1] ** 2)
+
+    error = 1 - np.abs(cc)
+
+    return error
+
+
+def eval_func5(vel, U, params):  # cross correlation of stream functions
+    x = vel[:, 0]
+    y = vel[:, 1]
+    m, x0, y0 = params
+
+    # calc velocity
+    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    vel_pred = np.vstack([u, v]).T
+
+    # calc error
+    cc = (vel[:, 2] * vel_pred[:, 0] + vel[:, 3] * vel_pred[:, 1])\
+         / np.sqrt(vel[:, 2] ** 2 + vel[:, 3] ** 2)\
+         / np.sqrt(vel_pred[:, 0] ** 2 + vel_pred[:, 1] ** 2)
+
+    error = 1 - np.abs(cc)
 
     return error
 
