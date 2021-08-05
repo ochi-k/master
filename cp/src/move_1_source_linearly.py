@@ -75,13 +75,13 @@ def graph(u, v, pars, t):
     plt.xticks(fontsize=24)
     plt.yticks(fontsize=24)
 
-    plt.streamplot(X, Y, u, v, density=2.5, color='k', arrowstyle='-', linewidth=0.75, zorder=1)  # streamline
+    # plt.streamplot(X, Y, u, v, density=2.5, color='k', arrowstyle='-', linewidth=0.75, zorder=1)  # streamline
 
     for par in pars:
         plt.scatter(par.x, par.y, s=120, zorder=2)
 
     # plt.show()
-    fig.savefig(f'../data/move_1_source_linearly/graph/t_{t}.png', dpi=300)
+    fig.savefig(f'../data/move_1_source_linearly/graph2/t_{t}.png', dpi=300)
 
     plt.clf()
     plt.close()
