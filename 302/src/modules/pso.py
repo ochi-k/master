@@ -76,7 +76,7 @@ def eval_func4(vel, U, params):  # cross correlation of vectors
     return error
 
 
-def eval_func5(vel, U, params):  # cross correlation of stream functions
+def eval_func5(vel, U, params):  # cross correlation of stream function
     x = vel[:, 0]
     y = vel[:, 1]
     m, x0, y0 = params

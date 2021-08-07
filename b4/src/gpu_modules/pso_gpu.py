@@ -5,22 +5,7 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-
-def eval_func(vel, x, y, U, params):  # evaluation function
-    m, x0, y0 = params
-
-    # calc velocity
-    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
-    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
-    vel_pred = torch.cat([u, v], dim=0)
-    # debug = np.count_nonzero(np.isnan(vel_pred.cpu().detach().numpy().copy()))
-
-    # calc error
-    error_norm = torch.norm(vel - vel_pred)
-    vel_norm = torch.norm(vel)
-    error = error_norm / vel_norm
-
-    return error
+import loss_function as lf
 
 
 def update_x(x, v):
@@ -46,24 +31,23 @@ def pso(vel_data, U):
     # device = "cpu"
 
     # set seeds
-    seed = 0
+    seed = 1234
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
 
     # remove NaN
     data_drop_na = pd.DataFrame(vel_data).dropna()
-    x = torch.tensor(data_drop_na[[0]].values, device=device)
-    y = torch.tensor(data_drop_na[[1]].values, device=device)
-    vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
+    data = torch.tensor(data_drop_na.values, device=device)
 
     # set params
-    n = 10000             # particles
-    dim = 3               # dimensions
-    generation = 10       # max generations
-    m_range = [0, 6000]   # m range
-    x0_range = [0, 160]   # x0 range
-    y0_range = [0, 120]   # y0 range
+    n = 10000                       # particles
+    dim = 3                         # dimensions
+    generation = 10                 # max generations
+    m_range = [0, 6000]             # m range
+    x0_range = [0, 160]             # x0 range
+    y0_range = [0, 120]             # y0 range
+    loss_func = lf.rel_vector_norm  # loss function
 
     # initialize particle position
     xs = torch.zeros(n, dim, device=device)
@@ -77,11 +61,11 @@ def pso(vel_data, U):
 
     # set vars for evaluation
     print("\n[set vars]")
-    p_i = xs                                                                    # best position of the i-th particle
-    best_scores = torch.tensor([eval_func(vel, x, y, U, i) for i in tqdm(xs)],  # eval personal best
+    p_i = xs                                                               # best position of the i-th particle
+    best_scores = torch.tensor([loss_func(data, U, i) for i in tqdm(xs)],  # eval personal best
                                device=device)
-    best_particle = torch.argmin(best_scores)                                   # particle index in minimum evals
-    p_g = p_i[best_particle.item()]                                             # global best
+    best_particle = torch.argmin(best_scores)                              # particle index in minimum evals
+    p_g = p_i[best_particle.item()]                                        # global best
     judge = 100
     tmp_p_g = None
     flag = 0
@@ -97,7 +81,7 @@ def pso(vel_data, U):
             xs[i] = update_x(xs[i], vs[i])
 
             # calc personal best
-            score = eval_func(vel, x, y, U, xs[i])
+            score = loss_func(data, U, xs[i])
             if score.item() < best_scores[i].item():
                 best_scores[i] = score
                 p_i[i] = xs[i]
@@ -128,7 +112,7 @@ def pso(vel_data, U):
 if __name__ == '__main__':
     print("start program!")
 
-    data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
-    error = pso(data, U=200)
+    sample_data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
+    error = pso(sample_data, U=200)
 
     print("\nPSO for gpu fin.")
