@@ -4,7 +4,7 @@ sys.path.append("../modules")
 import numpy as np
 import pandas as pd
 
-import pso
+import pso_gpu as pso
 
 
 sys.path.append("../modules")
@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     df = pd.DataFrame([["m", "x0", "y0", "error"]])
 
-    sample_data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
+    sample_data = np.loadtxt("../../data/sample_cp_half.csv", delimiter=",")
     result = pso.pso(sample_data, U=200)
     df = pd.concat([df, result])
 

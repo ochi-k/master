@@ -142,7 +142,7 @@ if __name__ == '__main__':
     y_min, y_max = -50, 50
     x = np.array([x_min, x_max])
     y = np.array([y_min, y_max])
-    n = np.array([100, 100])  # grid_num(#x, #y)
+    n = np.array([50, 50])  # grid_num(#x, #y)
 
     # instance
     field = Field(x, y, n)
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     u_1d = u.reshape(-1)
     v_1d = v.reshape(-1)
     df = pd.DataFrame(np.array([X_1d, Y_1d, u_1d, v_1d, 1/u_1d, 1/v_1d]).T).dropna()
-    df.to_csv('../../data/sample_cp.csv', header=False, index=False)
+    df.to_csv('../../data/sample_cp_half.csv', header=False, index=False)
 
     # graph
     from matplotlib import pyplot as plt
