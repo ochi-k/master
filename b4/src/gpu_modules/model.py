@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-import stream_function
+from gpu_modules import stream_function
 
 
 class Flow(object):
@@ -17,13 +17,13 @@ class Flow(object):
 
     @property
     def vel(self):
-        if type(self.u) != type(np.array([0])):
-            return torch.cat([self.u, self.v], dim=0)
+        if type(self.u).__module__ != "numpy":
+            return torch.cat([self.u, self.v], dim=1)
         return np.vstack([self.u, self.v]).T
 
     @property
     def speed(self):
-        if type(self.u) != type(np.array([0])):
+        if type(self.u).__module__ != "numpy":
             return torch.sqrt(self.u ** 2 + self.v ** 2)
         return np.sqrt(self.u ** 2 + self.v ** 2)
 

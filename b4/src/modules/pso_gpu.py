@@ -5,7 +5,22 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from gpu_modules import loss_function as lf
+
+def eval_func(vel, x, y, U, params):  # evaluation function
+    m, x0, y0 = params
+
+    # calc velocity
+    u = m * (x - x0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    v = - U + m * (y - y0) / ((x - x0) ** 2 + (y - y0) ** 2)
+    vel_pred = torch.cat([u, v], axis=1)
+    # debug = np.count_nonzero(np.isnan(vel_pred.cpu().detach().numpy().copy()))
+
+    # calc error
+    error_norm = torch.norm(vel - vel_pred)
+    vel_norm = torch.norm(vel)
+    error = error_norm / vel_norm
+
+    return error
 
 
 def update_x(x, v):
@@ -28,9 +43,10 @@ def update_v(device, x, v, p_i, p_g, w=0.5, r_max=1.0, c1=1, c2=1):
 def pso(vel_data, U):
     # set device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    # device = "cpu"
 
     # set seeds
-    seed = 1234
+    seed = 0
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
@@ -42,13 +58,12 @@ def pso(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 10000                       # particles
-    dim = 3                         # dimensions
-    generation = 10                 # max generations
-    m_range = [0, 3000]             # m range
-    x0_range = [-40, 40]            # x0 range
-    y0_range = [-40, 40]            # y0 range
-    loss_func = lf.speed  # loss function
+    n = 10000             # particles
+    dim = 3               # dimensions
+    generation = 10       # max generations
+    m_range = [0, 3000]   # m range
+    x0_range = [-40, 40]  # x0 range
+    y0_range = [-40, 40]  # y0 range
 
     # initialize particle position
     xs = torch.zeros(n, dim, device=device)
@@ -63,13 +78,19 @@ def pso(vel_data, U):
     # set vars for evaluation
     print("\n[set vars]")
     p_i = xs                                                                    # best position of the i-th particle
-    best_scores = torch.tensor([loss_func(vel, x, y, U, i) for i in tqdm(xs)],  # eval personal best
+    best_scores = torch.tensor([eval_func(vel, x, y, U, i) for i in tqdm(xs)],  # eval personal best
                                device=device)
     best_particle = torch.argmin(best_scores)                                   # particle index in minimum evals
     p_g = p_i[best_particle.item()]                                             # global best
     judge = 100
     tmp_p_g = None
     flag = 0
+
+    # for analysis
+    m_list = []
+    x0_list = []
+    y0_list = []
+    error_list = []
 
     # generations loop
     print("\n[generate]")
@@ -82,7 +103,7 @@ def pso(vel_data, U):
             xs[i] = update_x(xs[i], vs[i])
 
             # calc personal best
-            score = loss_func(vel, x, y, U, xs[i])
+            score = eval_func(vel, x, y, U, xs[i])
             if score.item() < best_scores[i].item():
                 best_scores[i] = score
                 p_i[i] = xs[i]
@@ -93,6 +114,12 @@ def pso(vel_data, U):
             judge = torch.min(best_scores)
             best_particle = torch.argmin(best_scores)
             tmp_p_g = p_i[best_particle.item()].clone().detach()
+
+            result = tmp_p_g.tolist()
+            m_list.append(result[0])
+            x0_list.append(result[1])
+            y0_list.append(result[2])
+            error_list.append(judge.item())
 
         else:
             flag += 1
@@ -106,18 +133,20 @@ def pso(vel_data, U):
     print(f"\n{tmp_p_g}")
     print(f"{judge}")
 
-    result = pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
-                                     min(best_scores).to('cpu').detach().numpy().copy())])
+    # save results
+    columns = ["m", "x0", "y0", "error"]
+    df = pd.concat([pd.Series(m_list), pd.Series(x0_list), pd.Series(y0_list), pd.Series(error_list)], axis=1)
+    df.columns = columns
+    df.to_csv('../../data/pso_result.csv')
 
-    torch.cuda.empty_cache()
-
-    return result
+    return pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
+                                   min(best_scores).to('cpu').detach().numpy().copy())])
 
 
 if __name__ == '__main__':
     print("start program!")
 
-    sample_data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
-    error = pso(sample_data, U=200)
+    data = np.loadtxt("../../data/sample_cp.csv", delimiter=",")
+    error = pso(data, U=200)
 
     print("\nPSO for gpu fin.")

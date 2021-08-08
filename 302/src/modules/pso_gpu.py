@@ -61,9 +61,9 @@ def pso(vel_data, U):
     n = 10000             # particles
     dim = 3               # dimensions
     generation = 10       # max generations
-    m_range = [0, 6000]   # m range
-    x0_range = [0, 160]   # x0 range
-    y0_range = [0, 120]   # y0 range
+    m_range = [0, 3000]   # m range
+    x0_range = [-40, 40]  # x0 range
+    y0_range = [-40, 40]  # y0 range
 
     # initialize particle position
     xs = torch.zeros(n, dim, device=device)
@@ -85,6 +85,12 @@ def pso(vel_data, U):
     judge = 100
     tmp_p_g = None
     flag = 0
+
+    # for analysis
+    m_list = []
+    x0_list = []
+    y0_list = []
+    error_list = []
 
     # generations loop
     print("\n[generate]")
@@ -109,6 +115,12 @@ def pso(vel_data, U):
             best_particle = torch.argmin(best_scores)
             tmp_p_g = p_i[best_particle.item()].clone().detach()
 
+            result = tmp_p_g.tolist()
+            m_list.append(result[0])
+            x0_list.append(result[1])
+            y0_list.append(result[2])
+            error_list.append(judge.item())
+
         else:
             flag += 1
 
@@ -121,8 +133,14 @@ def pso(vel_data, U):
     print(f"\n{tmp_p_g}")
     print(f"{judge}")
 
+    # save results
+    columns = ["m", "x0", "y0", "error"]
+    df = pd.concat([pd.Series(m_list), pd.Series(x0_list), pd.Series(y0_list), pd.Series(error_list)], axis=1)
+    df.columns = columns
+    df.to_csv('../../data/pso_result.csv')
+
     return pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
-                                  min(best_scores).to('cpu').detach().numpy().copy())])
+                                   min(best_scores).to('cpu').detach().numpy().copy())])
 
 
 if __name__ == '__main__':

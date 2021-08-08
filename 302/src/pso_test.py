@@ -17,7 +17,7 @@ if __name__ == '__main__':
     for u in U:
         for q in Q:
             for d in D:
-                data = np.loadtxt(f"../data/ave/ave_u_{u}_q_{q}_d_{d}_ppm_0.csv", delimiter=",")
+                data = np.loadtxt(f"../data/ave/masked_u_{u}_q_{q}_d_{d}_ppm_0.csv", delimiter=",")
                 graph.quiver(data, u, "show")
                 result = pso.pso(data, U=u)
                 df = pd.concat([df, result])

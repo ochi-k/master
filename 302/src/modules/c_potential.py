@@ -178,4 +178,5 @@ if __name__ == '__main__':
 
     plt.streamplot(X, Y, u, v, density=2, color='k', arrowstyle='-', linewidth=1)  # streamline
 
-    plt.show()
+    # plt.show()
+    fig.savefig("../../data/cp_img.png", dpi=300)

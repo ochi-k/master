@@ -92,6 +92,12 @@ def adam(data, U):
         if outputs < 1e-4:
             break
 
+    # save results
+    columns = ["m", "x0", "y0", "error"]
+    df = pd.concat([pd.Series(m_list), pd.Series(x0_list), pd.Series(y0_list), pd.Series(f_list)], axis=1)
+    df.columns = columns
+    df.to_csv('../data/adam_result.csv')
+
     from matplotlib import pyplot as plt
 
     fig = plt.figure(figsize=(15, 10))

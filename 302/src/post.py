@@ -70,11 +70,11 @@ def quiver(data, speed=0, mode=None, out_dir="/"):
     plt.clim(-10, 10)
     # plt.clim(0, 1.5)
 
-    x = x[0::2, 0::2]
-    y = y[0::2, 0::2]
-    u = u[0::2, 0::2]
-    v = v[0::2, 0::2]
-
+    # x = x[0::2, 0::2]
+    # y = y[0::2, 0::2]
+    # u = u[0::2, 0::2]
+    # v = v[0::2, 0::2]
+    #
     plt.quiver(x, y, u, v, scale_units='xy', scale=0.15)
 
     if mode == "show":

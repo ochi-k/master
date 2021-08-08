@@ -176,3 +176,4 @@ def stream_function(data, grid, option=None):
         return s_f[:-1, :-1].flatten(), v_p[:-1, :-1].flatten()
 
     return params
+
