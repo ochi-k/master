@@ -1,7 +1,13 @@
+import sys
+sys.path.append("../gpu_modules")
+
 import numpy as np
 import pandas as pd
 
-from gpu_modules import pso_gpu as pso
+import pso_gpu as pso
+
+
+sys.path.append("../gpu_modules")
 
 
 if __name__ == '__main__':
