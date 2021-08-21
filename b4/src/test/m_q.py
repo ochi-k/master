@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == '__main__':
-    q_m_data = np.loadtxt("../../data/Q30.csv", delimiter=",", skiprows=1)
+    q_m_data = np.loadtxt("../../data/Q18.csv", delimiter=",", skiprows=1)
     u = [175, 200, 225, 250]
     c = ["red", "blue", "green", "orange"]
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -21,5 +21,5 @@ if __name__ == '__main__':
         marker = m[u.index(line[1])]
         plt.scatter(line[0], line[2], label=line[1], c=color, s=500, marker=marker, zorder=10)
     plt.grid()
-    plt.show()
-    plt.savefig("../../data/m_Q30.png", dpi=300)
+    # plt.show()
+    plt.savefig("../../data/m_Q18.png", dpi=300)
