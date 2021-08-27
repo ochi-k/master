@@ -105,7 +105,7 @@ def pso(vel_data, U):
         best_particle = torch.argmin(best_scores)
         p_g = p_i[best_particle.item()]
 
-        tmp_result = torch.cat((p_g, judge), 1)
+        tmp_result = torch.cat((p_g, torch.tensor(judge)), 1)
         result = torch.cat((result, tmp_result), 0)
 
     print(f"\n{tmp_p_g}")
