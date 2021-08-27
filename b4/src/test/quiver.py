@@ -1,8 +1,11 @@
+import sys
+sys.path.append("../modules")
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 
-from modules import calc
+import calc
 
 
 def quiver(data, speed=0, depth=0, mode=None, out_dir="/"):
@@ -10,7 +13,7 @@ def quiver(data, speed=0, depth=0, mode=None, out_dir="/"):
     plt.xticks(fontsize=4)
     plt.yticks(fontsize=4)
     plt.xlim(0, 156)
-    plt.ylim(122, 0)
+    plt.ylim(0, 122)
 
     wid, hei = 1280, 1024
     grid = 24
@@ -19,7 +22,7 @@ def quiver(data, speed=0, depth=0, mode=None, out_dir="/"):
     x = data[:, 0].reshape((J, I))
     y = data[:, 1].reshape((J, I))
     u = data[:, 2].reshape((J, I))
-    v = - data[:, 3].reshape((J, I))
+    v = data[:, 3].reshape((J, I))
     o = np.sqrt(u ** 2 + v ** 2)
     omega = calc.vorticity(data=data, grid=(I, J), option="abs").reshape((J, I)) * depth / speed
 
@@ -71,7 +74,7 @@ def graph():
             for d in D:
                 file = f"../../data/masked_u_{u}_q_{q}_d_{d}_ppm_0"
                 mask_data = np.loadtxt(file + ".csv", delimiter=",")
-                quiver(mask_data, speed=u, depth=d*10, mode="save", out_dir=file)
+                quiver(mask_data, speed=u, depth=d*10, mode="show", out_dir=file)
 
 
 def main():

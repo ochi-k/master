@@ -42,12 +42,12 @@ def pso(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 10000                       # particles
+    n = 100                         # particles
     dim = 3                         # dimensions
     generation = 100                # max generations
-    m_range = [0, 3000]             # m range
-    x0_range = [-40, 40]            # x0 range
-    y0_range = [-40, 40]            # y0 range
+    m_range = [0, 4000]             # m range
+    x0_range = [90, 110]            # x0 range
+    y0_range = [80, 110]            # y0 range
     loss_func = lf.global_vector_norm  # loss function
 
     # initialize particle position

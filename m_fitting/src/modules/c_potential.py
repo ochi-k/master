@@ -148,18 +148,15 @@ class VortexLine(Item):
 
 
 if __name__ == '__main__':
-    x_min, x_max = -50, 50
-    y_min, y_max = -50, 50
-    x = np.array([x_min, x_max])
-    y = np.array([y_min, y_max])
-    n = np.array([100, 100])  # grid_num(#x, #y)
+    file_path = "../../data/mask.csv"
+    coordinates = np.loadtxt(file_path, delimiter=',')
+    coordinate_x, coordinate_y = coordinates[:, 0], coordinates[:, 1]
+    grid = (42, 53)
+    X = coordinate_x.reshape(grid)
+    Y = coordinate_y.reshape(grid)
 
-    # instance
-    field = Field(x, y, n)
-    X, Y = field.coordinates
-
-    uni_flow = UniformFlow(U=200, alpha=np.deg2rad(-90))
-    source = Source(m=2000, z=(X, Y), z0=(10, -5))
+    uni_flow = UniformFlow(U=175, alpha=np.deg2rad(-90))
+    source = Source(m=3000, z=(X, Y), z0=(100, 90))
 
     # velocity: v_x = u(y, x), v_y = v(y, x)
     u = uni_flow.vx + source.vx
@@ -171,7 +168,7 @@ if __name__ == '__main__':
     Y_1d = Y.reshape(-1)
     u_1d = u.reshape(-1)
     v_1d = v.reshape(-1)
-    df = pd.DataFrame(np.array([X_1d, Y_1d, u_1d, v_1d, 1/u_1d, 1/v_1d]).T).dropna()
+    df = pd.DataFrame(np.array([X_1d, Y_1d, u_1d, v_1d]).T).dropna()
     df.to_csv('../../data/sample_cp2.csv', header=False, index=False)
 
     # graph
@@ -179,8 +176,8 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots(figsize=(12, 10))
     ax.set_aspect('equal')
-    ax.set_xlim([x_min, x_max])
-    ax.set_ylim([y_min, y_max])
+    ax.set_xlim([0, np.max(X)])
+    ax.set_ylim([0, np.max(Y)])
     plt.xlabel('$\it{x}$ [mm]', fontsize=28)
     plt.ylabel('$\it{y}$ [mm]', fontsize=28)
     plt.xticks(fontsize=24)
