@@ -42,12 +42,12 @@ def pso(vel_data, U):
     vel = torch.tensor(data_drop_na[[2, 3]].values, device=device)
 
     # set params
-    n = 100                         # particles
+    n = 1000000                         # particles
     dim = 3                         # dimensions
     generation = 100                # max generations
     m_range = [0, 4000]             # m range
     x0_range = [90, 110]            # x0 range
-    y0_range = [80, 110]            # y0 range
+    y0_range = [90, 110]            # y0 range
     loss_func = lf.global_vector_norm  # loss function
 
     # initialize particle position
@@ -70,6 +70,7 @@ def pso(vel_data, U):
     judge = 1e16
     tmp_p_g = None
     flag = 0
+    result = torch.tensor([[0, 0, 0, 0]])
 
     # generations loop
     print("\n[generate]")
@@ -104,15 +105,20 @@ def pso(vel_data, U):
         best_particle = torch.argmin(best_scores)
         p_g = p_i[best_particle.item()]
 
+        tmp_result = torch.cat((p_g, judge), 1)
+        result = torch.cat((result, tmp_result), 0)
+
     print(f"\n{tmp_p_g}")
     print(f"{judge}")
 
-    result = pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
-                                     min(best_scores).to('cpu').detach().numpy().copy())])
+    # result = pd.DataFrame([np.append(p_g.to('cpu').detach().numpy().copy(),
+    #                                  min(best_scores).to('cpu').detach().numpy().copy())])
+
+    result = pd.DataFrame(result.detach().numpy().copy())
 
     torch.cuda.empty_cache()
 
-    return result
+    return result.loc[1:, :]
 
 
 if __name__ == '__main__':

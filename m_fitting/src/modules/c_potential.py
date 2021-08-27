@@ -156,20 +156,20 @@ if __name__ == '__main__':
     Y = coordinate_y.reshape(grid)
 
     uni_flow = UniformFlow(U=175, alpha=np.deg2rad(-90))
-    source = Source(m=3000, z=(X, Y), z0=(100, 90))
+    source = Source(m=2579.2061, z=(X, Y), z0=(115, 57))
 
     # velocity: v_x = u(y, x), v_y = v(y, x)
     u = uni_flow.vx + source.vx
     v = uni_flow.vy + source.vy
 
     # save coordinates and velocity
-    import pandas as pd
-    X_1d = X.reshape(-1)
-    Y_1d = Y.reshape(-1)
-    u_1d = u.reshape(-1)
-    v_1d = v.reshape(-1)
-    df = pd.DataFrame(np.array([X_1d, Y_1d, u_1d, v_1d]).T).dropna()
-    df.to_csv('../../data/sample_cp2.csv', header=False, index=False)
+    # import pandas as pd
+    # X_1d = X.reshape(-1)
+    # Y_1d = Y.reshape(-1)
+    # u_1d = u.reshape(-1)
+    # v_1d = v.reshape(-1)
+    # df = pd.DataFrame(np.array([X_1d, Y_1d, u_1d, v_1d]).T).dropna()
+    # df.to_csv('../../data/sample_cp2.csv', header=False, index=False)
 
     # graph
     from matplotlib import pyplot as plt
